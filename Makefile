@@ -1,19 +1,54 @@
-.PHONY: test lint format install clean
+PYTHON := .venv/bin/python
+PIP := .venv/bin/pip
+PYTEST := .venv/bin/pytest
+RUFF := .venv/bin/ruff
+MYPY := .venv/bin/mypy
+PRE_COMMIT := .venv/bin/pre-commit
 
-install:
-	python -m pip install -e ".[dev]"
+.PHONY: help setup install-dev format format-check lint typecheck test check clean pre-commit-install
 
-test:
-	python -m pytest tests/ -v
+help:
+	@echo "setup               Create venv, install dev deps, and install pre-commit hooks"
+	@echo "install-dev         Install project in editable mode with dev extras"
+	@echo "format              Run ruff formatter"
+	@echo "format-check        Check formatting without modifying files"
+	@echo "lint                Run ruff linter"
+	@echo "typecheck           Run mypy"
+	@echo "test                Run pytest"
+	@echo "check               Run format-check, lint, typecheck, and test"
+	@echo "pre-commit-install  Install git hooks"
+	@echo "clean               Remove caches"
 
-lint:
-	python -m ruff check src tests
-	python -m mypy src
+setup:
+	python3.13 -m venv .venv
+	$(PIP) install --upgrade pip
+	$(PIP) install -e ".[dev]"
+	$(PRE_COMMIT) install
+
+install-dev:
+	$(PIP) install -e ".[dev]"
 
 format:
-	python -m ruff format src tests
-	python -m ruff check --fix src tests
+	$(RUFF) format src tests
+
+format-check:
+	$(RUFF) format --check src tests
+
+lint:
+	$(RUFF) check src tests
+
+typecheck:
+	$(MYPY) src tests
+
+test:
+	$(PYTEST)
+
+check: format-check lint typecheck test
+
+pre-commit-install:
+	$(PRE_COMMIT) install
 
 clean:
-	rm -rf build/ dist/ *.egg-info .pytest_cache .mypy_cache .ruff_cache htmlcov
-	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
