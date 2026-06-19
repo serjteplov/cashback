@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash:mkdir",
+      "Bash:ls",
+      "Bash:git status",
+      "Bash:git diff",
+      "Bash:git log",
+      "Bash:cat",
+      "Bash:python -m pytest",
+      "Bash:python -m coverage",
+      "Bash:python -m mypy",
+      "Bash:python -m ruff",
+      "Bash:make test",
+      "Bash:make lint",
+      "Bash:make format"
+    ]
+  }
+}
